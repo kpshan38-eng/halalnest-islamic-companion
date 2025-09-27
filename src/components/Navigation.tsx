@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bell, Menu, X, User, BookOpen, Calculator, Clock, Home, Users, FileText } from 'lucide-react';
+import { Bell, Menu, X, User, BookOpen, Calculator, Clock, Home, Users, FileText, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { currentUser, loading, signOut } = useFirebaseAuth();
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -66,12 +70,40 @@ const Navigation = () => {
             </Button>
 
             {/* Sign In / Profile */}
-            <Link to="/auth">
-              <Button variant="outline" className="hidden sm:inline-flex items-center space-x-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
-                <User className="w-4 h-4" />
-                <span>Sign In</span>
-              </Button>
-            </Link>
+            {!loading && (
+              currentUser ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={currentUser.photoURL || ''} alt={currentUser.displayName || 'User'} />
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {currentUser.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <div className="flex flex-col space-y-1 p-2">
+                      <p className="text-sm font-medium leading-none">{currentUser.displayName || 'User'}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{currentUser.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="outline" className="hidden sm:inline-flex items-center space-x-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+                    <User className="w-4 h-4" />
+                    <span>Sign In</span>
+                  </Button>
+                </Link>
+              )
+            )}
 
             {/* Mobile menu trigger */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -86,12 +118,32 @@ const Navigation = () => {
               </SheetTrigger>
               <SheetContent side="right" className="w-80 bg-background/95 backdrop-blur-md">
                 <div className="flex flex-col space-y-4 mt-8">
-                  <Link to="/auth" className="w-full">
-                    <Button variant="outline" className="w-full justify-start space-x-2">
-                      <User className="w-4 h-4" />
-                      <span>Sign In</span>
-                    </Button>
-                  </Link>
+                  {!loading && (
+                    currentUser ? (
+                      <div className="flex items-center space-x-3 p-4 bg-muted/50 rounded-lg">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={currentUser.photoURL || ''} alt={currentUser.displayName || 'User'} />
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {currentUser.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{currentUser.displayName || 'User'}</p>
+                          <p className="text-xs text-muted-foreground">{currentUser.email}</p>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                          <LogOut className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Link to="/auth" className="w-full">
+                        <Button variant="outline" className="w-full justify-start space-x-2">
+                          <User className="w-4 h-4" />
+                          <span>Sign In</span>
+                        </Button>
+                      </Link>
+                    )
+                  )}
                   
                   <div className="border-t border-border/50 pt-4">
                     {navItems.map((item) => (
