@@ -57,6 +57,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Islamic design tokens
+        "islamic-green": "hsl(var(--islamic-green))",
+        "islamic-gold": "hsl(var(--islamic-gold))",
+        "islamic-cream": "hsl(var(--islamic-cream))",
+      },
+      fontFamily: {
+        'arabic': ['Noto Sans Arabic', 'Amiri', 'serif'],
+        'elegant': ['Inter', 'Noto Sans', 'sans-serif'],
+        'sans': ['Inter', 'Noto Sans', 'system-ui', 'sans-serif'],
+      },
+      backgroundImage: {
+        'gradient-islamic': 'var(--gradient-islamic)',
+        'gradient-gold': 'var(--gradient-gold)',
+        'gradient-hero': 'var(--gradient-hero)',
+      },
+      boxShadow: {
+        'islamic': 'var(--shadow-islamic)',
+        'gold': 'var(--shadow-gold)',
+        'elegant': 'var(--shadow-elegant)',
       },
       borderRadius: {
         lg: "var(--radius)",
