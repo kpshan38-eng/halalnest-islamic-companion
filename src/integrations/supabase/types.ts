@@ -14,7 +14,132 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      essays: {
+        Row: {
+          category: string | null
+          content: string
+          created_at: string | null
+          id: string
+          is_published: boolean | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          is_published?: boolean | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_published?: boolean | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      quran_progress: {
+        Row: {
+          bookmarked: boolean | null
+          id: string
+          last_read_at: string | null
+          surah_number: number
+          total_verses: number
+          user_id: string
+          verse_number: number
+        }
+        Insert: {
+          bookmarked?: boolean | null
+          id?: string
+          last_read_at?: string | null
+          surah_number: number
+          total_verses: number
+          user_id: string
+          verse_number: number
+        }
+        Update: {
+          bookmarked?: boolean | null
+          id?: string
+          last_read_at?: string | null
+          surah_number?: number
+          total_verses?: number
+          user_id?: string
+          verse_number?: number
+        }
+        Relationships: []
+      }
+      zakat_calculations: {
+        Row: {
+          calculated_at: string | null
+          cash_savings: number | null
+          currency: string | null
+          gold_value: number | null
+          id: string
+          investments: number | null
+          silver_value: number | null
+          total_wealth: number
+          user_id: string
+          zakat_due: number
+        }
+        Insert: {
+          calculated_at?: string | null
+          cash_savings?: number | null
+          currency?: string | null
+          gold_value?: number | null
+          id?: string
+          investments?: number | null
+          silver_value?: number | null
+          total_wealth: number
+          user_id: string
+          zakat_due: number
+        }
+        Update: {
+          calculated_at?: string | null
+          cash_savings?: number | null
+          currency?: string | null
+          gold_value?: number | null
+          id?: string
+          investments?: number | null
+          silver_value?: number | null
+          total_wealth?: number
+          user_id?: string
+          zakat_due?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
