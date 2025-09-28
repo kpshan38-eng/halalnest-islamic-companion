@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { toast } from '@/hooks/use-toast';
 import halalNestLogo from '@/assets/halal-nest-logo.png';
 
 const Navigation = () => {
@@ -69,7 +70,21 @@ const Navigation = () => {
               variant="ghost"
               size="icon"
               className="relative hover:bg-muted transition-colors duration-300"
-              title="Notifications (Alt+T)"
+              title="Notifications"
+              onClick={() => {
+                if (!user) {
+                  toast({
+                    title: "Sign in required",
+                    description: "Please sign in to view notifications",
+                    variant: "destructive"
+                  });
+                  return;
+                }
+                toast({
+                  title: "Notifications",
+                  description: "Opening notification center...",
+                });
+              }}
             >
               <Bell className="w-5 h-5" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-secondary rounded-full border-2 border-background"></span>

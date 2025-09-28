@@ -48,10 +48,7 @@ const Community = () => {
   };
 
   const handleAskScholar = () => {
-    toast({
-      title: "Scholar Assistant",
-      description: "Opening AI-powered Islamic guidance...",
-    });
+    window.location.href = '/scholar-assistant';
   };
 
   const handleLearnMore = () => {

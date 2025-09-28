@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
+import BlossomButton from "./components/BlossomButton";
 import PrayerTimes from "./pages/PrayerTimes";
 import Quran from "./pages/Quran";
 import Calculators from "./pages/Calculators";
@@ -17,6 +18,7 @@ import InvestmentCalculator from "./pages/InvestmentCalculator";
 import DateConverter from "./pages/DateConverter";
 import QiblaFinder from "./pages/QiblaFinder";
 import InheritanceCalculator from "./pages/InheritanceCalculator";
+import ScholarAssistant from "./pages/ScholarAssistant";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,7 @@ const App = () => (
       <BrowserRouter>
         <div className="min-h-screen bg-background">
           <Navigation />
+          <BlossomButton />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/prayer-times" element={<PrayerTimes />} />
@@ -37,6 +40,7 @@ const App = () => (
             <Route path="/calculators/date-converter" element={<DateConverter />} />
             <Route path="/calculators/qibla-finder" element={<QiblaFinder />} />
             <Route path="/calculators/inheritance" element={<InheritanceCalculator />} />
+            <Route path="/scholar-assistant" element={<ScholarAssistant />} />
             <Route path="/articles" element={<Articles />} />
             <Route path="/community" element={<Community />} />
             <Route path="/auth" element={<Auth />} />

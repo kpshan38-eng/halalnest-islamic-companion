@@ -47,6 +47,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          article_notifications: boolean
+          community_notifications: boolean
+          created_at: string
+          email_notifications: boolean
+          id: string
+          prayer_notifications: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          article_notifications?: boolean
+          community_notifications?: boolean
+          created_at?: string
+          email_notifications?: boolean
+          id?: string
+          prayer_notifications?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          article_notifications?: boolean
+          community_notifications?: boolean
+          created_at?: string
+          email_notifications?: boolean
+          id?: string
+          prayer_notifications?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -100,6 +133,62 @@ export type Database = {
           verse_number?: number
         }
         Relationships: []
+      }
+      scholar_assistant_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      scholar_assistant_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scholar_assistant_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "scholar_assistant_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       zakat_calculations: {
         Row: {
