@@ -50,11 +50,18 @@ All colors MUST be HSL. Islamic-inspired warm color palette.
     --gradient-islamic: linear-gradient(135deg, hsl(var(--islamic-green)), hsl(var(--islamic-light-green)));
     --gradient-gold: linear-gradient(135deg, hsl(var(--islamic-gold)), hsl(var(--islamic-dark-gold)));
     --gradient-hero: linear-gradient(135deg, hsl(var(--islamic-green)) 0%, hsl(var(--islamic-light-green)) 50%, hsl(var(--islamic-gold)) 100%);
+    --gradient-rainbow: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--secondary)), hsl(var(--islamic-gold)));
+    --gradient-aurora: linear-gradient(135deg, hsl(var(--primary)/0.8), hsl(var(--accent)/0.6), hsl(var(--islamic-gold)/0.4));
+    --gradient-sunset: linear-gradient(180deg, hsl(var(--islamic-gold)), hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-ocean: linear-gradient(135deg, hsl(var(--primary)/0.7), hsl(var(--accent)/0.5), hsl(var(--background)));
+    --gradient-radial: radial-gradient(circle at center, hsl(var(--primary)/0.3), hsl(var(--accent)/0.1), transparent);
 
     /* Shadows */
     --shadow-islamic: 0 10px 30px -10px hsl(var(--islamic-green) / 0.2);
     --shadow-gold: 0 5px 20px -5px hsl(var(--islamic-gold) / 0.3);
     --shadow-elegant: 0 4px 20px -4px hsl(var(--islamic-green) / 0.15);
+    --shadow-aurora: 0 0 60px hsl(var(--accent) / 0.4), 0 0 100px hsl(var(--primary) / 0.2);
+    --shadow-rainbow: 0 0 50px hsl(var(--primary) / 0.3), 0 0 80px hsl(var(--accent) / 0.2), 0 0 120px hsl(var(--islamic-gold) / 0.1);
 
     /* Typography */
     --font-arabic: 'Noto Sans Arabic', 'Amiri', serif;
@@ -124,6 +131,7 @@ All colors MUST be HSL. Islamic-inspired warm color palette.
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-elegant);
+    background-image: var(--gradient-radial), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="islamic-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1.5" fill="hsl(142 72% 29% / 0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23islamic-pattern)"/></svg>');
   }
 
   /* Arabic text styling */
@@ -223,6 +231,56 @@ All colors MUST be HSL. Islamic-inspired warm color palette.
     animation: glow 2s ease-in-out infinite alternate;
   }
 
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, hsl(var(--primary)/0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  .animate-pulse-rainbow {
+    animation: pulse-rainbow 4s ease-in-out infinite;
+  }
+
+  .animate-rotate-gradient {
+    animation: rotate-gradient 8s linear infinite;
+  }
+
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-aurora);
+  }
+
+  .gradient-border {
+    position: relative;
+    background: var(--gradient-aurora);
+    border-radius: var(--radius);
+    padding: 2px;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    background: var(--gradient-rainbow);
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: rotate-gradient 3s linear infinite;
+  }
+
   /* Arabic font class */
   .font-arabic {
     font-family: 'Amiri', 'Traditional Arabic', 'Arabic Typesetting', serif;
@@ -259,5 +317,64 @@ All colors MUST be HSL. Islamic-inspired warm color palette.
   }
   to {
     box-shadow: 0 0 30px hsl(var(--islamic-gold) / 0.6), 0 0 40px hsl(var(--islamic-gold) / 0.4);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-rainbow {
+  0%, 100% {
+    background: var(--gradient-islamic);
+  }
+  25% {
+    background: var(--gradient-aurora);
+  }
+  50% {
+    background: var(--gradient-sunset);
+  }
+  75% {
+    background: var(--gradient-ocean);
+  }
+}
+
+@keyframes rotate-gradient {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

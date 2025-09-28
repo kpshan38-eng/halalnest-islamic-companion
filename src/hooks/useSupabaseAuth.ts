@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { playDoorbell } from '@/utils/audioUtils';
 
 export const useSupabaseAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -14,6 +15,11 @@ export const useSupabaseAuth = () => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Play doorbell sound on successful sign in
+        if (event === 'SIGNED_IN' && session?.user) {
+          setTimeout(() => playDoorbell(), 100);
+        }
       }
     );
 
