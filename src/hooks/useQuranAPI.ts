@@ -62,9 +62,9 @@ export const useQuranAPI = () => {
     setError(null);
     
     try {
-      const response = await fetch('/functions/v1/quran-api?action=chapters', {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quran-api?action=chapters`, {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
       });
 
@@ -86,9 +86,9 @@ export const useQuranAPI = () => {
     setError(null);
     
     try {
-      const response = await fetch(`/functions/v1/quran-api?action=verses&chapter=${chapterNumber}`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quran-api?action=verses&chapter=${chapterNumber}`, {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
       });
 
@@ -111,9 +111,9 @@ export const useQuranAPI = () => {
     setError(null);
     
     try {
-      const response = await fetch(`/functions/v1/quran-api?action=chapter-info&chapter=${chapterNumber}`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quran-api?action=chapter-info&chapter=${chapterNumber}`, {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
       });
 
@@ -133,9 +133,9 @@ export const useQuranAPI = () => {
 
   const fetchAudio = async (chapterNumber: number): Promise<{ audio_file?: { audio_url: string } } | null> => {
     try {
-      const response = await fetch(`/functions/v1/quran-api?action=audio&chapter=${chapterNumber}`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quran-api?action=audio&chapter=${chapterNumber}`, {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
       });
 

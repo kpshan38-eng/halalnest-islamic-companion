@@ -234,6 +234,14 @@ All colors MUST be HSL. Islamic-inspired warm color palette.
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
+  
+  .animate-slide-in-right {
+    animation: var(--animate-slide-in-right);
+  }
+  
+  .animate-fade-in {
+    animation: var(--animate-fade-in);
+  }
 
   .animate-bounce-in {
     animation: bounce-in 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);

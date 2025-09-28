@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
 import BlossomButton from "./components/BlossomButton";
+import { NotificationBar } from "./components/NotificationBar";
 import PrayerTimes from "./pages/PrayerTimes";
 import Quran from "./pages/Quran";
 import ChapterReader from "./pages/ChapterReader";
@@ -37,6 +38,7 @@ const App = () => (
         <div className="min-h-screen bg-background">
           <Navigation />
           <BlossomButton />
+          <NotificationBar />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/prayer-times" element={<PrayerTimes />} />
