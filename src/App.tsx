@@ -25,6 +25,8 @@ import ScholarAssistant from "./pages/ScholarAssistant";
 import Resources from "./pages/Resources";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import AdminDashboard from "./pages/AdminDashboard";
+import PaperSubmission from "./pages/PaperSubmission";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +59,8 @@ const App = () => (
             <Route path="/resources" element={<Resources />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/submit-paper" element={<PaperSubmission />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
