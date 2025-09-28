@@ -30,7 +30,7 @@ const Navigation = () => {
     { name: 'Prayer Times', href: '/prayer-times', icon: Clock },
     { name: 'Holy Quran', href: '/quran', icon: BookOpen },
     { name: 'Islamic Calculators', href: '/calculators', icon: Calculator },
-    { name: 'Articles', href: '/articles', icon: FileText },
+    { name: 'Resources', href: '/resources', icon: FileText },
     { name: 'Community', href: '/community', icon: Users },
     { name: 'Dashboard', href: '/dashboard', icon: Settings },
   ];

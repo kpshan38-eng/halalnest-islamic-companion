@@ -20,6 +20,9 @@ import DateConverter from "./pages/DateConverter";
 import QiblaFinder from "./pages/QiblaFinder";
 import InheritanceCalculator from "./pages/InheritanceCalculator";
 import ScholarAssistant from "./pages/ScholarAssistant";
+import Resources from "./pages/Resources";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +50,9 @@ const App = () => (
             <Route path="/community" element={<Community />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

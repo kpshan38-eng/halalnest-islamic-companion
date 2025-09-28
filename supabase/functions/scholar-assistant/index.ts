@@ -117,7 +117,16 @@ You help Muslims in their daily lives with questions about worship, Islamic juri
 
     console.log('Calling OpenRouter API with messages:', messages.length);
 
-    // Call OpenRouter API with grok-4-fast
+    // Check for special users and add personalized greeting
+    const specialUsers = ['shankp', 'nizam', 'masood'];
+    const userEmail = user.email?.toLowerCase() || '';
+    const isSpecialUser = specialUsers.some(name => userEmail.includes(name));
+    
+    if (isSpecialUser && conversationHistory.length === 0) {
+      messages[0].content += `\n\nNote: This user (${user.email}) is a valued member of our community. Provide especially thoughtful and detailed responses.`;
+    }
+
+    // Call OpenRouter API with grok-4-fast and streaming
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -132,7 +141,7 @@ You help Muslims in their daily lives with questions about worship, Islamic juri
         temperature: 0.7,
         max_tokens: 1500,
         top_p: 0.9,
-        stream: false
+        stream: true
       }),
     });
 
@@ -142,25 +151,71 @@ You help Muslims in their daily lives with questions about worship, Islamic juri
       throw new Error(`OpenRouter API error: ${response.status}`);
     }
 
-    const data = await response.json();
-    const assistantMessage = data.choices[0].message.content;
+    // Handle streaming response
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error('No response body');
+    }
 
-    console.log('OpenRouter response received, length:', assistantMessage.length);
+    const decoder = new TextDecoder();
+    let fullMessage = '';
+    
+    // Create a readable stream for Server-Sent Events
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-    // Save assistant message
-    await supabase
-      .from('scholar_assistant_messages')
-      .insert({
-        conversation_id: currentConversationId,
-        role: 'assistant',
-        content: assistantMessage
-      });
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') {
+                  // Save complete message to database
+                  await supabase
+                    .from('scholar_assistant_messages')
+                    .insert({
+                      conversation_id: currentConversationId,
+                      role: 'assistant',
+                      content: fullMessage
+                    });
+                  
+                  controller.enqueue(`data: ${JSON.stringify({ type: 'done', conversationId: currentConversationId })}\n\n`);
+                  controller.close();
+                  return;
+                }
+                
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.choices?.[0]?.delta?.content) {
+                    const content = parsed.choices[0].delta.content;
+                    fullMessage += content;
+                    controller.enqueue(`data: ${JSON.stringify({ type: 'content', content })}\n\n`);
+                  }
+                } catch (e) {
+                  // Skip invalid JSON
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Streaming error:', error);
+          controller.error(error);
+        }
+      }
+    });
 
-    return new Response(JSON.stringify({
-      message: assistantMessage,
-      conversationId: currentConversationId
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return new Response(stream, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
     });
 
   } catch (error: unknown) {
