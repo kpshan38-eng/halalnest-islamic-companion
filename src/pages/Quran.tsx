@@ -1,9 +1,18 @@
-import { BookOpen, Search, Volume2, Bookmark, Download } from 'lucide-react';
+import { BookOpen, Search, Volume2, Bookmark, Download, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
+import { useState } from 'react';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { AuthGuard } from '@/components/AuthGuard';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const Quran = () => {
+  const { user } = useSupabaseAuth();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [playingChapter, setPlayingChapter] = useState<number | null>(null);
+
   const chapters = [
     { number: 1, name: 'Al-Fatiha', translation: 'The Opening', verses: 7, revelation: 'Makkah' },
     { number: 2, name: 'Al-Baqarah', translation: 'The Cow', verses: 286, revelation: 'Madinah' },
@@ -12,6 +21,96 @@ const Quran = () => {
     { number: 5, name: 'Al-Maidah', translation: 'The Table', verses: 120, revelation: 'Madinah' },
     { number: 6, name: 'Al-Anam', translation: 'The Cattle', verses: 165, revelation: 'Makkah' },
   ];
+
+  const filteredChapters = chapters.filter(chapter =>
+    chapter.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    chapter.translation.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleReadChapter = (chapterNumber: number, chapterName: string) => {
+    toast({
+      title: "Opening Chapter",
+      description: `Starting to read ${chapterName}...`,
+    });
+    // In a real app, this would navigate to a chapter reading page
+  };
+
+  const handleBookmarkChapter = async (chapterNumber: number, chapterName: string) => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to bookmark chapters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await supabase.from('quran_progress').upsert({
+        user_id: user.id,
+        surah_number: chapterNumber,
+        verse_number: 1,
+        total_verses: chapters.find(c => c.number === chapterNumber)?.verses || 0,
+        bookmarked: true
+      });
+
+      toast({
+        title: "Bookmarked",
+        description: `${chapterName} has been bookmarked`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to bookmark chapter",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePlayAudio = (chapterNumber: number) => {
+    if (playingChapter === chapterNumber) {
+      setPlayingChapter(null);
+      toast({
+        title: "Audio Paused",
+        description: "Chapter recitation paused",
+      });
+    } else {
+      setPlayingChapter(chapterNumber);
+      toast({
+        title: "Playing Audio",
+        description: "Chapter recitation started",
+      });
+    }
+  };
+
+  const handleDownload = () => {
+    toast({
+      title: "Download Started",
+      description: "Quran chapters are being downloaded...",
+    });
+  };
+
+  const handleViewBookmarks = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to view bookmarks",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Bookmarks",
+      description: "Opening your bookmarked chapters...",
+    });
+  };
+
+  const handleContinueReading = () => {
+    toast({
+      title: "Continue Reading",
+      description: "Opening your last read position...",
+    });
+  };
 
   return (
     <main className="min-h-screen bg-background py-8">
@@ -30,14 +129,16 @@ const Quran = () => {
               <Input
                 placeholder="Search chapters, verses, or keywords..."
                 className="pl-12"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="flex gap-3">
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleDownload}>
                 <Download className="w-4 h-4 mr-2" />
                 Download
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleViewBookmarks}>
                 <Bookmark className="w-4 h-4 mr-2" />
                 Bookmarks
               </Button>
@@ -75,8 +176,8 @@ const Quran = () => {
 
         {/* Chapters Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {chapters.map((chapter) => (
-            <Card key={chapter.number} className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+          {filteredChapters.map((chapter) => (
+            <Card key={chapter.number} className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
@@ -87,8 +188,17 @@ const Quran = () => {
                     <p className="text-sm text-muted-foreground">{chapter.translation}</p>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon">
-                  <Volume2 className="w-4 h-4" />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => handlePlayAudio(chapter.number)}
+                  className={playingChapter === chapter.number ? "text-secondary" : ""}
+                >
+                  {playingChapter === chapter.number ? (
+                    <Pause className="w-4 h-4" />
+                  ) : (
+                    <Volume2 className="w-4 h-4" />
+                  )}
                 </Button>
               </div>
               
@@ -98,10 +208,18 @@ const Quran = () => {
               </div>
 
               <div className="flex gap-2">
-                <Button className="flex-1" size="sm">
+                <Button 
+                  className="flex-1" 
+                  size="sm"
+                  onClick={() => handleReadChapter(chapter.number, chapter.name)}
+                >
                   Read Chapter
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleBookmarkChapter(chapter.number, chapter.name)}
+                >
                   <Bookmark className="w-4 h-4" />
                 </Button>
               </div>
@@ -119,7 +237,7 @@ const Quran = () => {
                 <p className="text-muted-foreground">Al-Baqarah - Verse 255 (Ayat-ul-Kursi)</p>
               </div>
             </div>
-            <Button className="btn-hero">
+            <Button className="btn-hero" onClick={handleContinueReading}>
               Continue Reading
             </Button>
           </div>

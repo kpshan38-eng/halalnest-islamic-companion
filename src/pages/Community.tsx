@@ -1,9 +1,65 @@
-import { Users, MessageCircle, Globe, Heart, Star, TrendingUp, Plus } from 'lucide-react';
+import { Users, MessageCircle, Globe, Heart, Star, TrendingUp, Plus, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 const Community = () => {
+  const { user } = useSupabaseAuth();
+
+  const handleStartDiscussion = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to start a discussion",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Start Discussion",
+      description: "Opening discussion creation form...",
+    });
+  };
+
+  const handleJoinDiscussion = (title: string) => {
+    toast({
+      title: "Joining Discussion",
+      description: `Opening: ${title}`,
+    });
+  };
+
+  const handleJoinCommunity = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to join the community",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Welcome!",
+      description: "You've joined our Islamic community",
+    });
+  };
+
+  const handleAskScholar = () => {
+    toast({
+      title: "Scholar Assistant",
+      description: "Opening AI-powered Islamic guidance...",
+    });
+  };
+
+  const handleLearnMore = () => {
+    toast({
+      title: "Learn More",
+      description: "Opening community guidelines and information...",
+    });
+  };
   const stats = [
     { label: 'Active Members', value: '50,000+', icon: Users },
     { label: 'Daily Discussions', value: '1,200+', icon: MessageCircle },
@@ -88,7 +144,7 @@ const Community = () => {
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold text-primary">Recent Discussions</h2>
-              <Button className="btn-hero">
+              <Button className="btn-hero" onClick={handleStartDiscussion}>
                 <Plus className="w-4 h-4 mr-2" />
                 Start Discussion
               </Button>
@@ -128,7 +184,11 @@ const Community = () => {
                       <span>{discussion.likes} likes</span>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleJoinDiscussion(discussion.title)}
+                  >
                     Join Discussion
                   </Button>
                 </div>
@@ -183,7 +243,12 @@ const Community = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Get AI-powered Islamic guidance for your questions, backed by authentic sources.
               </p>
-              <Button variant="outline" className="w-full hover:bg-secondary hover:text-secondary-foreground">
+              <Button 
+                variant="outline" 
+                className="w-full hover:bg-secondary hover:text-secondary-foreground"
+                onClick={handleAskScholar}
+              >
+                <Bot className="w-4 h-4 mr-2" />
                 Ask Scholar Assistant
               </Button>
             </Card>
@@ -198,10 +263,10 @@ const Community = () => {
             Join thousands of Muslims worldwide in meaningful discussions and authentic Islamic learning.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="btn-hero">
+            <Button className="btn-hero" onClick={handleJoinCommunity}>
               Join Community
             </Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={handleLearnMore}>
               Learn More
             </Button>
           </div>

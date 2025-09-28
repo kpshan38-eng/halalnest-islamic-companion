@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import halalNestLogo from '@/assets/halal-nest-logo.png';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,8 +31,12 @@ const Navigation = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-islamic rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              <span className="text-white font-bold text-lg">ح</span>
+            <div className="w-12 h-12 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+              <img 
+                src={halalNestLogo} 
+                alt="HalalNest Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="hidden sm:block">
               <h1 className="text-2xl font-bold text-primary">HalalNest</h1>

@@ -3,15 +3,52 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 const Articles = () => {
+  const { user } = useSupabaseAuth();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    toast({
+      title: "Searching",
+      description: `Looking for articles matching "${value}"...`,
+    });
+  };
+
+  const handleCategoryFilter = (categoryName: string) => {
+    setActiveCategory(categoryName);
+    toast({
+      title: "Filter Applied", 
+      description: `Showing ${categoryName} articles`,
+    });
+  };
+
+  const handleReadArticle = (title: string) => {
+    toast({
+      title: "Opening Article",
+      description: `Reading: ${title}`,
+    });
+  };
+
+  const handleSignInToContinue = () => {
+    toast({
+      title: "Sign In Required",
+      description: "Please sign in to access advanced features",
+    });
+  };
   const categories = [
-    { name: 'All', count: 45, active: true },
-    { name: 'Spirituality', count: 12, active: false },
-    { name: 'Islamic Finance', count: 8, active: false },
-    { name: 'Sunnah', count: 15, active: false },
-    { name: 'Family & Life', count: 6, active: false },
-    { name: 'Prayer & Worship', count: 4, active: false },
+    { name: 'All', count: 45, active: activeCategory === 'All' },
+    { name: 'Spirituality', count: 12, active: activeCategory === 'Spirituality' },
+    { name: 'Islamic Finance', count: 8, active: activeCategory === 'Islamic Finance' },
+    { name: 'Sunnah', count: 15, active: activeCategory === 'Sunnah' },
+    { name: 'Family & Life', count: 6, active: activeCategory === 'Family & Life' },
+    { name: 'Prayer & Worship', count: 4, active: activeCategory === 'Prayer & Worship' },
   ];
 
   const articles = [
@@ -100,6 +137,8 @@ const Articles = () => {
               <Input
                 placeholder="Search articles, topics, or authors..."
                 className="pl-12"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
             
@@ -110,6 +149,7 @@ const Articles = () => {
                   variant={category.active ? "default" : "outline"}
                   size="sm"
                   className={category.active ? "btn-hero" : ""}
+                  onClick={() => handleCategoryFilter(category.name)}
                 >
                   {category.name} ({category.count})
                 </Button>
@@ -142,7 +182,7 @@ const Articles = () => {
                   </div>
                 </div>
                 
-                <Button className="btn-hero">Read Full Article</Button>
+                <Button className="btn-hero" onClick={() => handleReadArticle(article.title)}>Read Full Article</Button>
               </div>
               
               <div className="bg-muted/30 rounded-xl aspect-video flex items-center justify-center">
@@ -186,7 +226,7 @@ const Articles = () => {
                   </div>
                 </div>
                 
-                <Button variant="outline" size="sm" className="w-full hover:bg-primary hover:text-primary-foreground">
+                <Button variant="outline" size="sm" className="w-full hover:bg-primary hover:text-primary-foreground" onClick={() => handleReadArticle(article.title)}>
                   Read Article
                 </Button>
               </div>
@@ -200,7 +240,7 @@ const Articles = () => {
           <p className="text-muted-foreground mb-4">
             Sign in to edit articles and access advanced features like bookmarking and commenting.
           </p>
-          <Button className="btn-gold">
+          <Button className="btn-gold" onClick={handleSignInToContinue}>
             Sign In to Continue
           </Button>
         </Card>

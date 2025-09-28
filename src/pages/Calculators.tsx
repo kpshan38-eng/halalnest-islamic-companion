@@ -2,6 +2,7 @@ import { Calculator, DollarSign, Calendar, Compass, Users, TrendingUp } from 'lu
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import ZakatCalculatorWidget from '@/components/ZakatCalculatorWidget';
+import { Link } from 'react-router-dom';
 
 const Calculators = () => {
   const calculators = [
@@ -10,35 +11,40 @@ const Calculators = () => {
       description: 'Calculate your obligatory charity based on Shariah principles',
       icon: DollarSign,
       color: 'bg-secondary/10 text-secondary',
-      featured: true
+      featured: true,
+      href: '#zakat-widget'
     },
     {
       title: 'Islamic Inheritance Calculator',
       description: 'Distribute estate according to Islamic inheritance law',
       icon: Users,
       color: 'bg-primary/10 text-primary',
-      features: ['Estate value input', 'Heir categories', 'Shariah-compliant distribution']
+      features: ['Estate value input', 'Heir categories', 'Shariah-compliant distribution'],
+      href: '/calculators/inheritance'
     },
     {
       title: 'Qibla Direction Finder',
       description: 'Find the direction to Kaaba from anywhere in the world',
       icon: Compass,
       color: 'bg-emerald-500/10 text-emerald-600',
-      features: ['GPS-based location', 'Accurate Kaaba direction', 'Interactive compass']
+      features: ['GPS-based location', 'Accurate Kaaba direction', 'Interactive compass'],
+      href: '/calculators/qibla-finder'
     },
     {
       title: 'Islamic Date Converter',
       description: 'Convert between Hijri and Gregorian calendars',
       icon: Calendar,
       color: 'bg-blue-500/10 text-blue-600',
-      features: ['Hijri to Gregorian', 'Gregorian to Hijri', 'Important Islamic dates']
+      features: ['Hijri to Gregorian', 'Gregorian to Hijri', 'Important Islamic dates'],
+      href: '/calculators/date-converter'
     },
     {
       title: 'Investment Calculator',
       description: 'Shariah-compliant investment and savings calculations',
       icon: TrendingUp,
       color: 'bg-purple-500/10 text-purple-600',
-      features: ['Halal investment options', 'Profit calculations', 'Risk assessment']
+      features: ['Halal investment options', 'Profit calculations', 'Risk assessment'],
+      href: '/calculators/investment'
     }
   ];
 
@@ -86,9 +92,18 @@ const Calculators = () => {
                     )}
                     
                     <div className="flex gap-3">
-                      <Button className={calc.featured ? "btn-gold" : ""}>
-                        {calc.featured ? "Use Calculator" : "Open Calculator"}
-                      </Button>
+                      {calc.featured ? (
+                        <Button 
+                          className="btn-gold"
+                          onClick={() => document.getElementById('zakat-widget')?.scrollIntoView({ behavior: 'smooth' })}
+                        >
+                          Use Calculator
+                        </Button>
+                      ) : (
+                        <Link to={calc.href}>
+                          <Button>Open Calculator</Button>
+                        </Link>
+                      )}
                       <Button variant="outline">Learn More</Button>
                     </div>
                   </div>
@@ -98,7 +113,7 @@ const Calculators = () => {
           </div>
 
           {/* Featured Calculator - Zakat Calculator Widget */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1" id="zakat-widget">
             <div className="sticky top-24">
               <ZakatCalculatorWidget />
             </div>

@@ -13,6 +13,10 @@ import Community from "./pages/Community";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import InvestmentCalculator from "./pages/InvestmentCalculator";
+import DateConverter from "./pages/DateConverter";
+import QiblaFinder from "./pages/QiblaFinder";
+import InheritanceCalculator from "./pages/InheritanceCalculator";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +33,10 @@ const App = () => (
             <Route path="/prayer-times" element={<PrayerTimes />} />
             <Route path="/quran" element={<Quran />} />
             <Route path="/calculators" element={<Calculators />} />
+            <Route path="/calculators/investment" element={<InvestmentCalculator />} />
+            <Route path="/calculators/date-converter" element={<DateConverter />} />
+            <Route path="/calculators/qibla-finder" element={<QiblaFinder />} />
+            <Route path="/calculators/inheritance" element={<InheritanceCalculator />} />
             <Route path="/articles" element={<Articles />} />
             <Route path="/community" element={<Community />} />
             <Route path="/auth" element={<Auth />} />
