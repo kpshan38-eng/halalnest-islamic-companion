@@ -6,53 +6,87 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { currentUser, loading, signInWithGoogle } = useFirebaseAuth();
+  const { user, loading, signUp, signIn, signInWithGoogle } = useSupabaseAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (currentUser && !loading) {
+    if (user && !loading) {
       navigate('/');
       toast({
         title: "Welcome to HalalNest!",
-        description: `Signed in as ${currentUser.displayName || currentUser.email}`,
+        description: `Signed in as ${user.user_metadata?.full_name || user.email}`,
       });
     }
-  }, [currentUser, loading, navigate, toast]);
+  }, [user, loading, navigate, toast]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    // Simulate API call for email/password auth
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
-    toast({
-      title: "Authentication Required",
-      description: "Email/password authentication requires Supabase integration. Please use Google Sign-In for now.",
-      variant: "destructive",
-    });
-  };
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setIsLoading(true);
-      await signInWithGoogle();
-    } catch (error: any) {
+    if (!email || !password) return;
+
+    setIsLoading(true);
+    const { error } = await signIn(email, password);
+    
+    if (error) {
       toast({
         title: "Sign-in Failed",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const fullName = formData.get('fullName') as string;
+
+    if (!email || !password) return;
+
+    setIsLoading(true);
+    const { error } = await signUp(email, password, fullName);
+    
+    if (error) {
+      toast({
+        title: "Sign-up Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success!",
+        description: "Please check your email to confirm your account.",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    const { error } = await signInWithGoogle();
+    
+    if (error) {
+      toast({
+        title: "Sign-in Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -79,13 +113,14 @@ const Auth = () => {
                 <p className="text-muted-foreground">Continue your Islamic journey</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="your@email.com"
                       className="pl-10"
@@ -100,6 +135,7 @@ const Auth = () => {
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="password"
+                      name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       className="pl-10 pr-10"
@@ -171,13 +207,14 @@ const Auth = () => {
                 <p className="text-muted-foreground">Join the HalalNest community</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="fullName"
+                      name="fullName"
                       type="text"
                       placeholder="Your full name"
                       className="pl-10"
@@ -192,6 +229,7 @@ const Auth = () => {
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="signupEmail"
+                      name="email"
                       type="email"
                       placeholder="your@email.com"
                       className="pl-10"
@@ -206,6 +244,7 @@ const Auth = () => {
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="phone"
+                      name="phone"
                       type="tel"
                       placeholder="+1 (555) 123-4567"
                       className="pl-10"
@@ -219,6 +258,7 @@ const Auth = () => {
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       id="signupPassword"
+                      name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Create a strong password"
                       className="pl-10 pr-10"
@@ -265,9 +305,9 @@ const Auth = () => {
         {/* Authentication Notice */}
         <div className="mt-8 p-4 bg-secondary/10 border border-secondary/20 rounded-xl text-center">
           <p className="text-sm text-muted-foreground">
-            <strong className="text-secondary">Google Sign-In:</strong> Now available! 
-            For email/password authentication and advanced features like community discussions, 
-            this app can be connected to Supabase for enhanced functionality.
+            <strong className="text-secondary">Supabase Authentication:</strong> Full authentication is now available! 
+            Sign up with email/password or use Google Sign-In to access all features including 
+            the dashboard for managing essays, tracking Quran progress, and saving calculations.
           </p>
         </div>
       </div>

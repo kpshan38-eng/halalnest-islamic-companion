@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bell, Menu, X, User, BookOpen, Calculator, Clock, Home, Users, FileText, LogOut } from 'lucide-react';
+import { Bell, Menu, X, User, BookOpen, Calculator, Clock, Home, Users, FileText, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { currentUser, loading, signOut } = useFirebaseAuth();
+  const { user, loading, signOut } = useSupabaseAuth();
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -19,6 +19,7 @@ const Navigation = () => {
     { name: 'Islamic Calculators', href: '/calculators', icon: Calculator },
     { name: 'Articles', href: '/articles', icon: FileText },
     { name: 'Community', href: '/community', icon: Users },
+    { name: 'Dashboard', href: '/dashboard', icon: Settings },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -71,24 +72,30 @@ const Navigation = () => {
 
             {/* Sign In / Profile */}
             {!loading && (
-              currentUser ? (
+              user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={currentUser.photoURL || ''} alt={currentUser.displayName || 'User'} />
+                        <AvatarImage src={user.user_metadata?.avatar_url || ''} alt={user.user_metadata?.full_name || 'User'} />
                         <AvatarFallback className="bg-primary text-primary-foreground">
-                          {currentUser.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
+                          {(user.user_metadata?.full_name || user.email || 'U').charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <div className="flex flex-col space-y-1 p-2">
-                      <p className="text-sm font-medium leading-none">{currentUser.displayName || 'User'}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{currentUser.email}</p>
+                      <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name || 'User'}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard" className="flex items-center cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
@@ -119,17 +126,17 @@ const Navigation = () => {
               <SheetContent side="right" className="w-80 bg-background/95 backdrop-blur-md">
                 <div className="flex flex-col space-y-4 mt-8">
                   {!loading && (
-                    currentUser ? (
+                    user ? (
                       <div className="flex items-center space-x-3 p-4 bg-muted/50 rounded-lg">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={currentUser.photoURL || ''} alt={currentUser.displayName || 'User'} />
+                          <AvatarImage src={user.user_metadata?.avatar_url || ''} alt={user.user_metadata?.full_name || 'User'} />
                           <AvatarFallback className="bg-primary text-primary-foreground">
-                            {currentUser.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
+                            {(user.user_metadata?.full_name || user.email || 'U').charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <p className="text-sm font-medium">{currentUser.displayName || 'User'}</p>
-                          <p className="text-xs text-muted-foreground">{currentUser.email}</p>
+                          <p className="text-sm font-medium">{user.user_metadata?.full_name || 'User'}</p>
+                          <p className="text-xs text-muted-foreground">{user.email}</p>
                         </div>
                         <Button variant="ghost" size="sm" onClick={() => signOut()}>
                           <LogOut className="w-4 h-4" />
