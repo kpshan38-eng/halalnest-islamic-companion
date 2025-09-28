@@ -7,27 +7,22 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { AuthGuard } from '@/components/AuthGuard';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useQuranAPI } from '@/hooks/useQuranAPI';
+import { useNavigate } from 'react-router-dom';
 
 const Quran = () => {
   const { user } = useSupabaseAuth();
+  const { chapters, loading: chaptersLoading, error } = useQuranAPI();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [playingChapter, setPlayingChapter] = useState<number | null>(null);
 
-  const chapters = [
-    { number: 1, name: 'Al-Fatiha', translation: 'The Opening', verses: 7, revelation: 'Makkah' },
-    { number: 2, name: 'Al-Baqarah', translation: 'The Cow', verses: 286, revelation: 'Madinah' },
-    { number: 3, name: 'Ali Imran', translation: 'The Family of Imran', verses: 200, revelation: 'Madinah' },
-    { number: 4, name: 'An-Nisa', translation: 'The Women', verses: 176, revelation: 'Madinah' },
-    { number: 5, name: 'Al-Maidah', translation: 'The Table', verses: 120, revelation: 'Madinah' },
-    { number: 6, name: 'Al-Anam', translation: 'The Cattle', verses: 165, revelation: 'Makkah' },
-  ];
-
   const filteredChapters = chapters.filter(chapter =>
-    chapter.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    chapter.translation.toLowerCase().includes(searchTerm.toLowerCase())
+    chapter.name_simple.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    chapter.translated_name.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleReadChapter = (chapterNumber: number, chapterName: string) => {
+  const handleReadChapter = (chapterId: number, chapterName: string) => {
     if (!user) {
       toast({
         title: "Sign in required",
@@ -37,21 +32,15 @@ const Quran = () => {
       return;
     }
     
+    navigate(`/quran/chapter/${chapterId}`);
+    
     toast({
       title: "Opening Chapter",
       description: `Starting to read ${chapterName}...`,
     });
-    
-    // Simulate saving progress
-    setTimeout(() => {
-      toast({
-        title: "Reading Progress Saved",
-        description: `Your progress in ${chapterName} has been saved`,
-      });
-    }, 2000);
   };
 
-  const handleBookmarkChapter = async (chapterNumber: number, chapterName: string) => {
+  const handleBookmarkChapter = async (chapterId: number, chapterName: string) => {
     if (!user) {
       toast({
         title: "Sign in required",
@@ -62,11 +51,12 @@ const Quran = () => {
     }
 
     try {
+      const chapter = chapters.find(c => c.id === chapterId);
       await supabase.from('quran_progress').upsert({
         user_id: user.id,
-        surah_number: chapterNumber,
+        surah_number: chapterId,
         verse_number: 1,
-        total_verses: chapters.find(c => c.number === chapterNumber)?.verses || 0,
+        total_verses: chapter?.verses_count || 0,
         bookmarked: true
       });
 
@@ -83,15 +73,15 @@ const Quran = () => {
     }
   };
 
-  const handlePlayAudio = (chapterNumber: number, chapterName: string) => {
-    if (playingChapter === chapterNumber) {
+  const handlePlayAudio = (chapterId: number, chapterName: string) => {
+    if (playingChapter === chapterId) {
       setPlayingChapter(null);
       toast({
         title: "Audio Paused",
         description: `Paused recitation of ${chapterName}`,
       });
     } else {
-      setPlayingChapter(chapterNumber);
+      setPlayingChapter(chapterId);
       toast({
         title: "Playing Audio",
         description: `Now playing recitation of ${chapterName}`,
@@ -218,55 +208,76 @@ const Quran = () => {
 
         {/* Chapters Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredChapters.map((chapter) => (
-            <Card key={chapter.number} className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-bold">{chapter.number}</span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-primary">{chapter.name}</h3>
-                    <p className="text-sm text-muted-foreground">{chapter.translation}</p>
+          {chaptersLoading ? (
+            Array.from({ length: 6 }).map((_, index) => (
+              <Card key={index} className="p-6 animate-pulse">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-muted rounded-full"></div>
+                    <div>
+                      <div className="h-4 bg-muted rounded w-24 mb-2"></div>
+                      <div className="h-3 bg-muted rounded w-32"></div>
+                    </div>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={() => handlePlayAudio(chapter.number, chapter.name)}
-                  className={playingChapter === chapter.number ? "text-secondary" : ""}
-                >
-                  {playingChapter === chapter.number ? (
-                    <Pause className="w-4 h-4" />
-                  ) : (
-                    <Volume2 className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                <span>{chapter.verses} verses</span>
-                <span>{chapter.revelation}</span>
-              </div>
+              </Card>
+            ))
+          ) : error ? (
+            <div className="col-span-full text-center py-8">
+              <p className="text-destructive mb-4">Failed to load chapters: {error}</p>
+              <Button onClick={() => window.location.reload()}>Try Again</Button>
+            </div>
+          ) : (
+            filteredChapters.map((chapter) => (
+              <Card key={chapter.id} className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                      <span className="text-primary font-bold">{chapter.id}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-primary">{chapter.name_simple}</h3>
+                      <p className="text-sm text-muted-foreground">{chapter.translated_name.name}</p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => handlePlayAudio(chapter.id, chapter.name_simple)}
+                    className={playingChapter === chapter.id ? "text-secondary" : ""}
+                  >
+                    {playingChapter === chapter.id ? (
+                      <Pause className="w-4 h-4" />
+                    ) : (
+                      <Volume2 className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+                
+                <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                  <span>{chapter.verses_count} verses</span>
+                  <span>{chapter.revelation_place}</span>
+                </div>
 
-              <div className="flex gap-2">
-                <Button 
-                  className="flex-1" 
-                  size="sm"
-                  onClick={() => handleReadChapter(chapter.number, chapter.name)}
-                >
-                  Read Chapter
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleBookmarkChapter(chapter.number, chapter.name)}
-                >
-                  <Bookmark className="w-4 h-4" />
-                </Button>
-              </div>
-            </Card>
-          ))}
+                <div className="flex gap-2">
+                  <Button 
+                    className="flex-1" 
+                    size="sm"
+                    onClick={() => handleReadChapter(chapter.id, chapter.name_simple)}
+                  >
+                    Read Chapter
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleBookmarkChapter(chapter.id, chapter.name_simple)}
+                  >
+                    <Bookmark className="w-4 h-4" />
+                  </Button>
+                </div>
+              </Card>
+            ))
+          )}
         </div>
 
         {/* Continue Reading */}

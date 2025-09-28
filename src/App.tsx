@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import BlossomButton from "./components/BlossomButton";
 import PrayerTimes from "./pages/PrayerTimes";
 import Quran from "./pages/Quran";
+import ChapterReader from "./pages/ChapterReader";
 import Calculators from "./pages/Calculators";
 import Articles from "./pages/Articles";
 import Community from "./pages/Community";
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/prayer-times" element={<PrayerTimes />} />
             <Route path="/quran" element={<Quran />} />
+            <Route path="/quran/chapter/:chapterNumber" element={<ChapterReader />} />
             <Route path="/calculators" element={<Calculators />} />
             <Route path="/calculators/investment" element={<InvestmentCalculator />} />
             <Route path="/calculators/date-converter" element={<DateConverter />} />
