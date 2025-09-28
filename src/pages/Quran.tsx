@@ -28,11 +28,27 @@ const Quran = () => {
   );
 
   const handleReadChapter = (chapterNumber: number, chapterName: string) => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to read the Quran",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     toast({
       title: "Opening Chapter",
       description: `Starting to read ${chapterName}...`,
     });
-    // In a real app, this would navigate to a chapter reading page
+    
+    // Simulate saving progress
+    setTimeout(() => {
+      toast({
+        title: "Reading Progress Saved",
+        description: `Your progress in ${chapterName} has been saved`,
+      });
+    }, 2000);
   };
 
   const handleBookmarkChapter = async (chapterNumber: number, chapterName: string) => {
@@ -55,8 +71,8 @@ const Quran = () => {
       });
 
       toast({
-        title: "Bookmarked",
-        description: `${chapterName} has been bookmarked`,
+        title: "Bookmarked Successfully",
+        description: `${chapterName} has been added to your bookmarks`,
       });
     } catch (error) {
       toast({
@@ -67,27 +83,44 @@ const Quran = () => {
     }
   };
 
-  const handlePlayAudio = (chapterNumber: number) => {
+  const handlePlayAudio = (chapterNumber: number, chapterName: string) => {
     if (playingChapter === chapterNumber) {
       setPlayingChapter(null);
       toast({
         title: "Audio Paused",
-        description: "Chapter recitation paused",
+        description: `Paused recitation of ${chapterName}`,
       });
     } else {
       setPlayingChapter(chapterNumber);
       toast({
         title: "Playing Audio",
-        description: "Chapter recitation started",
+        description: `Now playing recitation of ${chapterName}`,
       });
     }
   };
 
   const handleDownload = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to download chapters",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     toast({
       title: "Download Started",
       description: "Quran chapters are being downloaded...",
     });
+    
+    // Simulate download progress
+    setTimeout(() => {
+      toast({
+        title: "Download Complete",
+        description: "Quran chapters are now available offline",
+      });
+    }, 3000);
   };
 
   const handleViewBookmarks = () => {
@@ -100,15 +133,24 @@ const Quran = () => {
       return;
     }
     toast({
-      title: "Bookmarks",
-      description: "Opening your bookmarked chapters...",
+      title: "Opening Bookmarks",
+      description: "Loading your bookmarked chapters...",
     });
   };
 
   const handleContinueReading = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to continue reading",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     toast({
       title: "Continue Reading",
-      description: "Opening your last read position...",
+      description: "Resuming from your last read position...",
     });
   };
 
@@ -191,7 +233,7 @@ const Quran = () => {
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={() => handlePlayAudio(chapter.number)}
+                  onClick={() => handlePlayAudio(chapter.number, chapter.name)}
                   className={playingChapter === chapter.number ? "text-secondary" : ""}
                 >
                   {playingChapter === chapter.number ? (

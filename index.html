@@ -8,6 +8,13 @@
     <meta name="author" content="HalalNest" />
     <meta name="keywords" content="Islamic companion, prayer times, Quran reader, Zakat calculator, Islamic tools, Muslim community, Halal, Islamic guidance" />
 
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2D5016" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="HalalNest" />
+    <link rel="manifest" href="/manifest.json" />
+
     <!-- Open Graph meta tags -->
     <meta property="og:title" content="HalalNest - Your Comprehensive Islamic Companion" />
     <meta property="og:description" content="Your comprehensive Islamic companion featuring authentic resources, prayer tools, and scholarly guidance in one beautiful platform." />
@@ -27,43 +34,19 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://halalnest.lovable.app" />
     
-    <!-- Firebase Auth Script -->
-    <script type="module">
-      // Core + products you use
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-analytics.js";
-      import {
-        getAuth,
-        GoogleAuthProvider,
-        signInWithPopup,
-        signOut,
-        onAuthStateChanged
-      } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-
-      // Your Firebase config
-      const firebaseConfig = {
-        apiKey: "AIzaSyARSVmxm4gzHGhKcZywBVFumdb13woov_U",
-        authDomain: "shanmonkp-d58ff.firebaseapp.com",
-        databaseURL: "https://shanmonkp-d58ff-default-rtdb.firebaseio.com",
-        projectId: "shanmonkp-d58ff",
-        storageBucket: "shanmonkp-d58ff.firebasestorage.app",
-        messagingSenderId: "132585193173",
-        appId: "1:132585193173:web:26f5a48ad317136e24ac5c",
-        measurementId: "G-5EEXVY1C7F"
-      };
-
-      // Initialize
-      const app = initializeApp(firebaseConfig);
-      // Analytics is optional; guard for environments where it's unavailable
-      let analytics; 
-      try { analytics = getAnalytics(app); } catch (e) {}
-
-      // Make Firebase auth available globally for React components
-      window.firebaseAuth = getAuth(app);
-      window.GoogleAuthProvider = GoogleAuthProvider;
-      window.signInWithPopup = signInWithPopup;
-      window.signOut = signOut;
-      window.onAuthStateChanged = onAuthStateChanged;
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
     </script>
   </head>
 
