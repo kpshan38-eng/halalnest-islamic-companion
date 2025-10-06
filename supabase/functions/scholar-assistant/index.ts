@@ -136,7 +136,7 @@ You help Muslims in their daily lives with questions about worship, Islamic juri
         'X-Title': 'HalalNest Islamic Companion'
       },
       body: JSON.stringify({
-        model: 'x-ai/grok-4-fast:free',
+        model: 'alibaba/tongyi-deepresearch-30b-a3b:free',
         messages: messages,
         temperature: 0.7,
         max_tokens: 1500,
